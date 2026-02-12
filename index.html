@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Soundtrack of your life</title>
+  <style>
+    :root {
+      /* Korean Aurora Palette: Soft pastels, dreamy glows */
+      --bg: #0f101a;
+      --aurora-pink: #ffb7c5;
+      --aurora-purple: #c3a6ff;
+      --aurora-cyan: #9efff3;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --text-main: #f0f0f5;
+      --text-dim: rgba(255, 255, 255, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text-main);
+      font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Aurora Glows */
+    .aurora-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(195, 166, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(158, 255, 243, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 183, 197, 0.1) 0%, transparent 50%);
+      filter: blur(80px);
+    }
+
+    .stage {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    /* Top Left: Title & Status */
+    .top-left {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Particle Background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      /* Above aurora-bg */
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+      animation: float-particle linear infinite;
+    }
+
+    @keyframes float-particle {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.85;
+      }
+
+      90% {
+        opacity: 0.85;
+      }
+
+      100% {
+        transform: translateY(-100vh) translateX(var(--drift));
+        opacity: 0;
+      }
+    }
+
+    .top-left h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(to right, var(--aurora-cyan), var(--aurora-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .top-left .status-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .timer {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 400;
+      opacity: 0.6;
+    }
+
+    /* Hide original header elements */
+    .top-left,
+    .top-right,
+    .observations-box {
+      display: none;
+    }
+
+    /* Collapsible Info Panel */
+    .info-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 400px;
+      max-height: 80vh;
+      background: rgba(15, 16, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border-top-right-radius: 30px;
+      padding: 30px;
+      transform: translateY(calc(100% - 60px));
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .info-panel.open {
+      transform: translateY(0);
+    }
+
+    .info-toggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-bright);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s;
+    }
+
+    .info-toggle:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.1);
+    }
+
+    .info-toggle.open {
+      transform: rotate(180deg);
+    }
+
+    .info-panel h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, var(--aurora-pink), var(--aurora-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .info-section {
+      margin-bottom: 20px;
+    }
+
+    .info-section label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .info-section .value {
+      font-size: 18px;
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
+    .info-section .notes {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+
+    .info-section .status-row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .info-section .status-row span {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .info-section .timer {
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Top Right: Scenario & Mood */
+    .top-right {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-box label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--aurora-pink);
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    .stat-box span {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Center: Big Eyes Buddy */
+    .centerContent {
+      flex: 1;
+      display: grid;
+      place-items: start center;
+      padding-top: 20px;
+      /* tweakable */
+    }
+
+    .buddyContainer {
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+
+    .blobBody {
+      position: absolute;
+      inset: 0;
+      /* Soft, organic morphing shape */
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+
+      /* Transition for smooth color and shape shifts */
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Ethereal Halo Base - Tightened slightly for more color presence */
+      background: radial-gradient(circle at center, var(--buddy-color, var(--aurora-purple)) 0%, transparent 85%);
+      filter: blur(25px);
+      /* Keep high blur to hide the circle */
+
+      /* Multilayered Shadow for wide, atmospheric aura */
+      box-shadow:
+        0 0 60px var(--buddy-color, var(--aurora-purple)),
+        0 0 120px var(--buddy-color, var(--aurora-purple)),
+        inset 0 0 30px rgba(255, 255, 255, 0.3);
+
+      opacity: 0.85;
+      /* Increased from 0.75 for more presence */
+      animation: float 8s ease-in-out infinite alternate, morph 12s ease-in-out infinite alternate;
+    }
+
+    /* Stronger Pastel Scenario Colors */
+    [data-scenario="office"] {
+      --buddy-color: #4fceff;
+    }
+
+    /* Sky Blue */
+    [data-scenario="date"] {
+      --buddy-color: #ff85a1;
+    }
+
+    /* Soft Rose */
+    [data-scenario="workout"] {
+      --buddy-color: #98ebad;
+    }
+
+    /* Spring Green */
+
+    @keyframes morph {
+      0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      }
+
+      50% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+      }
+
+      100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      }
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(1.0);
+      }
+
+      33% {
+        transform: translateY(-30px) rotate(4deg) scale(1.05);
+      }
+
+      66% {
+        transform: translateY(-15px) rotate(-4deg) scale(1.02);
+      }
+
+      100% {
+        transform: translateY(-45px) rotate(0deg) scale(1.1);
+      }
+    }
+
+    @keyframes pulse-halo-vibrant {
+      0% {
+        transform: scale(1);
+        opacity: 0.9;
+        filter: blur(4px);
+      }
+
+      100% {
+        transform: scale(1.08);
+        opacity: 0.7;
+        filter: blur(12px);
+      }
+    }
+
+    .face {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(-10px);
+      opacity: 0.85;
+    }
+
+    .eyes {
+      display: flex;
+      gap: 60px;
+      /* Wider gap for larger eyes */
+      margin-bottom: 5px;
+    }
+
+    .eye {
+      width: 140px;
+      height: 140px;
+      position: relative;
+      overflow: visible;
+      /* Allow lashes to stick out */
+      z-index: 10;
+    }
+
+    .eye-iris {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #fff;
+      border: 4px solid #1e293b;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      animation: eye-blink 5s infinite;
+      z-index: 1;
+    }
+
+    /* --- EYELIDS (Natural Curves) --- */
+    .eye-iris::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -10%;
+      width: 120%;
+      height: 0;
+      background: #1e293b;
+      z-index: 10;
+      border-radius: 0 0 50% 50%;
+      /* Default curve */
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Lower Eyelid (for resting/tired) */
+    .eye-iris::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: -10%;
+      width: 120%;
+      height: 0;
+      background: #1e293b;
+      z-index: 10;
+      border-radius: 50% 50% 0 0;
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* 1) FOCUSED - Wide open, alert */
+    .buddy.office.focused .eye-iris::before,
+    .buddy.office.focused .eye-iris::after {
+      height: 0%;
+    }
+
+    /* 2) BREAK - Normal eyes, wide open */
+    .buddy.office.break .eye-iris::before,
+    .buddy.office.break .eye-iris::after {
+      height: 0%;
+    }
+
+    /* 3) ROMANTIC - Flirty half-lidded (OPAQUE) */
+    .buddy.date.romantic .eye-iris::before {
+      height: 35%;
+      background: #1e293b;
+      opacity: 1;
+      /* Opaque */
+    }
+
+    /* 4) DATE GONE WRONG - Awkward neutral/uneasy (OPAQUE) */
+    .buddy.date.date-gone-wrong .eye-iris::before {
+      height: 15%;
+      opacity: 1;
+    }
+
+    .buddy.date.date-gone-wrong .eye:nth-child(1) .eye-iris::before {
+      height: 20%;
+      /* Uneven for awkwardness */
+    }
+
+    /* 5) WORKOUT ACTIVE - Determined strain (V-shape, OPAQUE) */
+    .buddy.workout.active .eye-iris::before {
+      height: 42%;
+      border-radius: 0 0 100% 0%;
+      /* Slant down toward center */
+      opacity: 1;
+    }
+
+    .buddy.workout.active .eye:nth-child(2) .eye-iris::before {
+      border-radius: 0 0 0% 100%;
+      /* Symmetrical slant */
+    }
+
+    /* 6) WORKOUT RESTING - Tired relief (Opaque heavy lids) */
+    .buddy.workout.resting .eye-iris::before {
+      height: 45%;
+      opacity: 1;
+    }
+
+    .buddy.workout.resting .eye-iris::after {
+      height: 12%;
+      /* Small arc on lower lid */
+      opacity: 1;
+    }
+
+    /* --- EYELASHES REMOVED --- */
+    .buddy.date .eye::before {
+      display: none;
+    }
+
+    .buddy.date .eye:nth-child(2)::before {
+      display: none;
+    }
+
+    @keyframes eye-blink {
+
+      0%,
+      96% {
+        transform: scaleY(1);
+      }
+
+      98% {
+        transform: scaleY(0.1);
+      }
+
+      100% {
+        transform: scaleY(1);
+      }
+    }
+
+    .pupil {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 85px;
+      /* Base size */
+      height: 85px;
+      background: #1e293b;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.4s ease-out;
+      /* Slower transition for expression changes */
+      z-index: 5;
+    }
+
+    /* PUPIL SIZE CHANGES BY MOOD */
+
+    /* Small pupils - Focused / Active / Awkward */
+    .buddy.office.focused .pupil,
+    .buddy.workout.active .pupil,
+    .buddy.date.date-gone-wrong .pupil {
+      width: 60px;
+      height: 60px;
+    }
+
+    /* Normal/Large pupils - Break / Resting */
+    .buddy.office.break .pupil,
+    .buddy.workout.resting .pupil {
+      width: 85px;
+      height: 85px;
+    }
+
+    /* 💖 HEART PUPILS for Romantic */
+    .buddy.date.romantic .pupil {
+      width: 50px;
+      height: 50px;
+      background: #ff4d6d;
+      /* Romantic pink/red heartbeat */
+      clip-path: polygon(50% 100%, 0% 35%, 0% 15%, 20% 0%, 50% 25%, 80% 0%, 100% 15%, 100% 35%);
+      border-radius: 0;
+      /* Clear path */
+    }
+
+    .buddy.date.romantic .pupil .reflection {
+      display: none;
+      /* Reflections usually look odd on heart shapes */
+    }
+
+    /* Pupil Attitude / Position */
+    .buddy.date.date-gone-wrong .eye:nth-child(1) .pupil {
+      margin-left: -5px;
+      /* Uneven pupils for awkwardness */
+    }
+
+    /* Enhance Reflection */
+    .pupil .reflection {
+      position: absolute;
+      top: 12%;
+      left: 12%;
+      width: 30px;
+      height: 30px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.95;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .mouth {
+      display: none;
+    }
+
+    /* Luminous Blush */
+    .blush {
+      display: none;
+    }
+
+    .blush.left {
+      left: -20px;
+    }
+
+    .blush.right {
+      right: -20px;
+    }
+
+    /* Reactions Container */
+    .reactions {
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* Date - Hearts */
+    .buddy.date .reactions::before {
+      content: "❤️";
+      font-size: 24px;
+      animation: floatUp 2s infinite;
+      position: absolute;
+      left: 30%;
+      opacity: 0;
+    }
+
+    .buddy.date .reactions::after {
+      content: "💖";
+      font-size: 20px;
+      animation: floatUp 2.5s infinite 0.7s;
+      position: absolute;
+      right: 30%;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(20px) scale(0.5);
+        opacity: 0;
+      }
+
+      20% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-40px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* Workout - Sweat */
+    .buddy.workout .reactions::before {
+      content: "💦";
+      font-size: 24px;
+      position: absolute;
+      right: -10px;
+      top: 50px;
+      animation: dripDown 1.5s infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes dripDown {
+      0% {
+        transform: translateY(0);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+    }
+
+    /* Office - Thinking */
+    .buddy.office .reactions::before {
+      content: "💭";
+      font-size: 32px;
+      position: absolute;
+      right: -20px;
+      top: 0px;
+      animation: floatBob 3s infinite ease-in-out;
+      opacity: 0.9;
+    }
+
+    @keyframes floatBob {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Observations Box: Bottom Half */
+    .observations-box {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 50%;
+      /* Middle to bottom */
+      background: linear-gradient(to bottom, transparent, rgba(15, 16, 26, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 60px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .observations-box label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--aurora-cyan);
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .observations-box .notes {
+      font-size: 24px;
+      line-height: 1.4;
+      font-weight: 300;
+      max-width: 800px;
+      color: #fff;
+    }
+
+    /* Camera (formerly Debug) */
+    .camera-drawer {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 300;
+    }
+
+    .cam-toggle {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 999px;
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s;
+    }
+
+    .cam-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* --- FLUFFY BEATING HEART --- */
+    .heart-beater-container {
+      position: fixed;
+      bottom: 400px;
+      right: 70px;
+      width: 100px;
+      height: 100px;
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .heart-beater {
+      width: 70px;
+      height: 70px;
+      background: #ff3b3b;
+      position: relative;
+      transform: rotate(-45deg);
+      box-shadow:
+        0 0 40px #ff3b3b,
+        0 0 80px rgba(255, 59, 59, 0.5);
+      animation: fluffBeat 1.4s infinite ease-in-out;
+      filter: blur(1px);
+      /* Slight softness */
+    }
+
+    .heart-beater::before,
+    .heart-beater::after {
+      content: "";
+      width: 70px;
+      height: 70px;
+      background: #ff3b3b;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .heart-beater::before {
+      top: -35px;
+      left: 0;
+    }
+
+    .heart-beater::after {
+      left: 35px;
+      top: 0;
+    }
+
+    @keyframes fluffBeat {
+
+      0%,
+      100% {
+        transform: rotate(-45deg) scale(1);
+        opacity: 0.9;
+      }
+
+      50% {
+        transform: rotate(-45deg) scale(1.15);
+        opacity: 1;
+        filter: blur(0px) drop-shadow(0 0 25px #ff3b3b);
+      }
+    }
+
+    .cam-panel {
+      position: absolute;
+      bottom: 50px;
+      right: 0;
+      width: 280px;
+      background: var(--bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 10px;
+      display: none;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .cam-panel.open {
+      display: block;
+    }
+
+    .debugVideo {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    /* Permission Popup - Refined for Aurora */
+    .permissionOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 16, 26, 0.8);
+      backdrop-filter: blur(40px);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      padding-top: 5vh;
+      /* Position in top half */
+    }
+
+    .permissionModal {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 48px;
+      border-radius: 40px;
+      max-width: 400px;
+      text-align: center;
+      height: fit-content;
+    }
+
+    .permissionModal h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, var(--aurora-pink), var(--aurora-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .allowBtn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: transform 0.2s;
+    }
+
+    .allowBtn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Hide Confidence elements as requested */
+    .confOuter,
+    #confFill,
+    #confText {
+      display: none !important;
+    }
+
+    /* Mobile Phones (Handsets) - Simplified for Aurora */
+    @media (max-width: 600px) {
+      .stage {
+        padding: 20px;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      body {
+        height: auto;
+        overflow-y: auto;
+      }
+
+      .top-left {
+        position: relative;
+        top: 0;
+        left: 0.5;
+        margin-bottom: 20px;
+        text-align: left;
+        align-items: left;
+      }
+
+      .top-left h1 {
+        font-size: 24px;
+      }
+
+      .top-right {
+        position: right;
+        top: 20;
+        right: 20;
+        text-align: right;
+        margin-bottom: 80px;
+      }
+
+      .centerContent {
+        padding: 10px 0 0;
+        min-height: 240px;
+        flex: none;
+      }
+
+      .buddyContainer {
+        width: 320px;
+        height: 320px;
+
+      }
+
+      .blobBody {
+        transform: scale(0.9);
+      }
+
+      .eyes {
+        gap: 40px;
+      }
+
+      .eye {
+        width: 112px;
+        height: 112px;
+      }
+
+      .observations-box {
+        position: relative;
+        top: auto;
+        padding: 40px 20px;
+        margin-top: 20px;
+        border-radius: 20px 20px 0 0;
+        background: rgba(15, 16, 26, 0.95);
+      }
+
+      .observations-box label {
+        margin-bottom: 16px;
+      }
+
+      .observations-box .notes {
+        font-size: 18px;
+      }
+
+      /* Camera Drawer */
+      .camera-drawer {
+        right: 20px;
+        bottom: 20px;
+        position: absolute;
+      }
+
+      .cam-panel {
+        width: calc(100vw - 40px);
+        right: 0;
+      }
+
+      .permissionModal {
+        padding: 32px;
+        border-radius: 30px;
+      }
+
+      .permissionModal h2 {
+        font-size: 24px;
+      }
+
+      .allowBtn {
+        padding: 14px 24px;
+        border-radius: 16px;
+      }
+
+      /* Heart Beater Mobile Position: Under Right Eye */
+      .heart-beater-container {
+        bottom: auto;
+        right: auto;
+        top: 540px;
+        /* Below the right eye, outside main halo */
+        left: 75%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="aurora-bg"></div>
+
+  <!-- Permission Popup -->
+  <div id="permissionOverlay" class="permissionOverlay">
+    <div class="permissionModal">
+      <h2>Ready to hear your life in music?</h2>
+      <p style="color: var(--text-dim); line-height: 1.6;">Enable camera and audio and let Adaptune tune the soundtrack
+        to your moment.</p>
+      <button id="allowBtn" class="allowBtn">Start Experience</button>
+    </div>
+  </div>
+
+  <!-- Particle Background -->
+  <div class="particles"></div>
+
+  <div class="stage">
+
+    <!-- Buddy Area (Full Screen) -->
+    <main class="centerContent">
+      <div class="buddyContainer buddy">
+        <div id="blobBody" class="blobBody"></div>
+        <div class="face">
+          <div class="reactions"></div>
+          <div class="eyes">
+            <div class="eye">
+              <div class="eye-iris">
+                <div class="pupil">
+                  <div class="reflection"></div>
+                </div>
+              </div>
+            </div>
+            <div class="eye">
+              <div class="eye-iris">
+                <div class="pupil">
+                  <div class="reflection"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Collapsible Info Panel -->
+    <div id="infoPanel" class="info-panel">
+      <button id="infoToggle" class="info-toggle">↑</button>
+
+      <h2>ADAPTUNE</h2>
+
+      <div class="info-section">
+        <label>Status</label>
+        <div class="status-row">
+          <span id="statusText">Thinking...</span>
+          <span class="timer" id="countdownText">--:--</span>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <label>Scenario</label>
+        <div class="value" id="scenarioOut">...</div>
+      </div>
+
+      <div class="info-section">
+        <label>Mood</label>
+        <div class="value" id="moodOut">...</div>
+      </div>
+
+      <div class="info-section">
+        <label>Observations</label>
+        <div class="notes" id="notesOut">Waiting for AI to analyze your vibe...</div>
+      </div>
+    </div>
+
+    <!-- Camera Drawer -->
+    <div id="debugDrawer" class="camera-drawer">
+      <div id="drawerPanel" class="cam-panel">
+        <video id="video" class="debugVideo" playsinline muted></video>
+        <div id="hintText" style="font-size:10px; color:var(--text-dim); margin-top:8px;"></div>
+      </div>
+      <button id="drawerToggle" class="cam-toggle">Camera</button>
+    </div>
+
+    <!-- Fluffy Heart -->
+    <div class="heart-beater-container">
+      <div class="heart-beater"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Particle background
+    function createParticles() {
+      const particlesContainer = document.querySelector('.particles');
+      if (!particlesContainer) return;
+
+      const particleCount = 80;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Eye tracking
+    function initEyeTracking() {
+      const pupils = document.querySelectorAll('.pupil');
+      const buddyContainer = document.querySelector('.buddyContainer');
+
+      document.addEventListener('mousemove', (e) => {
+        if (!buddyContainer) return;
+
+        pupils.forEach(pupil => {
+          const eye = pupil.parentElement;
+          const eyeRect = eye.getBoundingClientRect();
+          const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+          const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+          const deltaX = e.clientX - eyeCenterX;
+          const deltaY = e.clientY - eyeCenterY;
+          const angle = Math.atan2(deltaY, deltaX);
+          const distance = Math.min(35, Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 10);
+
+          const pupilX = Math.cos(angle) * distance;
+          const pupilY = Math.sin(angle) * distance;
+
+          pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
+        });
+      });
+    }
+
+    // Info panel toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      initEyeTracking();
+
+      const infoPanel = document.getElementById('infoPanel');
+      const infoToggle = document.getElementById('infoToggle');
+
+      if (infoToggle && infoPanel) {
+        infoToggle.addEventListener('click', () => {
+          infoPanel.classList.toggle('open');
+          infoToggle.classList.toggle('open');
+        });
+      }
+
+      // Manual Override Shortcuts & Buttons
+      const forceActive = () => {
+        console.log("[Manual Force] Workout Active");
+        if (typeof applyResult === 'function') {
+          applyResult({
+            scenario: 'workout',
+            mood: 'active',
+            confidence: 1.0,
+            notes: "Manual force: Workout Active triggered! 🔥"
+          });
+        }
+      };
+
+      const forceRest = () => {
+        console.log("[Manual Force] Workout Resting");
+        if (typeof applyResult === 'function') {
+          applyResult({
+            scenario: 'workout',
+            mood: 'resting',
+            confidence: 1.0,
+            notes: "Manual force: Workout Resting triggered! ✨"
+          });
+        }
+      };
+
+      // Manual Override Shortcuts
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'w') forceActive();
+        if (e.key.toLowerCase() === 'r') forceRest();
+      });
+    });
+  </script>
+  <script src="./adaptune-supsi.js"></script>
+</body>
+
+</html>
